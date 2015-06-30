@@ -1,0 +1,56 @@
+println "the project name is $name"
+
+allprojects {
+  task world << {task -> println "I'm $task.project.name"}
+}
+
+subprojects{
+  world << {println "- I depend on water"}
+}
+
+
+
+
+
+
+task ping(type:Exec){
+  commandLine './ping.sh'
+}
+
+task hello {
+  doLast{
+      println "Hello world"
+    }   
+  doFirst{
+      println "I am xxx"
+    }   
+}
+
+hello.onlyIf { !project.hasProperty('skipHello') }
+
+task intro(dependsOn: hello) << {
+    println "I'm Gradle" 
+}
+
+ext.projectProperties="ext projectProperties-value"
+task printExtProps << {
+  ext.taskProperties="ext.task.properties-value"
+  if (project.hasProperty('projectProperties')){
+    println "ext.projectProperties values is " + projectProperties  
+  }
+  if (printExtProps.hasProperty('taskProperties')){
+    println "task has defined ext.taskProperties value is " + taskProperties  
+  }
+}
+
+task taskX << {
+    println 'taskX'
+}
+
+taskX.dependsOn {
+    tasks.findAll { task -> task.name.startsWith('lib') }
+}
+
+task lib1 << {
+    println 'lib1'
+}
